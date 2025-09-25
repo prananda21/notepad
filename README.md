@@ -1,73 +1,72 @@
-# React + TypeScript + Vite
+# React + TypeScript + Vite (Ultracite Linting)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This app uses Vite + React (SWC) and Ultracite as the single tool for linting and formatting on top of Biome. Ultracite enforces strict a11y, TypeScript, React, and code-quality rules with subsecond performance and zero config.
 
-Currently, two official plugins are available:
+The project-level config is in `biome.jsonc`:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- `extends: ["ultracite"]` – enables the full rule set
 
-## React Compiler
+## Quick start
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+Install deps, run the dev server, build, and preview:
 
-## Expanding the ESLint configuration
+```sh
+# install
+bun install
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+# dev server
+bun run dev
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+# type-check + build
+bun run build
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# preview production build
+bun run preview
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+If you prefer npm or pnpm, replace `bun` with your package manager.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Linting and formatting with Ultracite
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Run checks without writing changes:
+
+```sh
+npx ultracite check
 ```
+
+Auto-fix issues and format the codebase (also available as a script):
+
+```sh
+# fixes and formats all files
+npx ultracite fix
+
+# or via package.json
+bun run lint
+```
+
+Notes:
+
+- Pre-commit: `lint-staged` is configured to run Ultracite on staged files. If you use Husky, wire `lint-staged` in a pre-commit hook to enforce this locally.
+- Editor: For best experience, install a Biome/Ultracite-compatible VS Code extension and enable format-on-save.
+
+## React + SWC note
+
+This project uses `@vitejs/plugin-react-swc` for Fast Refresh. The React Compiler is not yet compatible with SWC; see the tracking issue: [vite-plugin-react issue #428](https://github.com/vitejs/vite-plugin-react/issues/428).
+
+## What Ultracite enforces (high level)
+
+- Accessibility: meaningful alt text, valid ARIA, focus management, keyboard handlers for interactive elements
+- TypeScript: no `any`, strict and safe patterns, no non-null assertions
+- React: stable hooks, correct deps, safe keys, no dangerous props
+- Code quality and style: no unused vars/imports, safe comparisons, consistent formatting via Biome
+
+## Project scripts
+
+- `dev` – start Vite dev server
+- `build` – type-check and build
+- `preview` – preview the production build
+- `lint` – run `ultracite fix`
+
+## Migrating from ESLint (optional)
+
+This project uses Ultracite instead of ESLint. If you don’t need ESLint anymore, you can remove any ESLint-specific config or dependencies left from the template.
